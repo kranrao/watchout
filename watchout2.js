@@ -7,6 +7,7 @@ var enemies = [{},{},{},{},{},{},{},{},{}];
 var currentScore = 0;
 var highScore = 0;
 var collisions = 0;
+var collisionCheck = false;
 
 //Randomizes cx and cy coordinates for enemies
 var positionGenerator = function (enemies) {
@@ -21,27 +22,30 @@ var positionGenerator = function (enemies) {
 
 //Function to check for collisions
 var collisionChecker = function (enemies, hero) {
-  var hero = {}
+  var hero = {};
+  var result = false;;
   hero['cx'] = d3.select(".hero").attr("cx");
   hero['cy'] = d3.select(".hero").attr("cy");
 
   _.each(enemies, function (value, key) {
     console.log('hero : ' + hero['cx'] + ', ' + hero['cy']);
-    console.log('enemy :', value['cx'] + ', ' + hero['cy']);
+    console.log('enemy :', value['cx'] + ', ' + value['cy']);
     console.log('-----------');
-    if (Math.abs(value['cy'] - hero['cy']) < 50 && Math.abs(value['cx'] - hero['cx']) < 50) {
+    if ((Math.abs(value['cy'] - hero['cy']) < 50) && (Math.abs(value['cx'] - hero['cx']) < 50)) {
       console.log("COLLISION!");
+       result = true;
     }
-  })
+    return result;
+  });
+  return result;
 };
 
 //Move "Enemies"
-var moveEnemies = function (enemies, hero, callback) {
+var moveEnemies = function (enemies) {
   positionGenerator(enemies);
   var enemy = d3.selectAll(".enemy").transition().duration(1500)
     .attr("cx", function (d) { return d['cx'];})
     .attr("cy", function (d) { return d['cy'];});
-    callback(enemies, hero);
 }
 
 //Creates SVG canvas
@@ -82,10 +86,15 @@ var enemy = svg.selectAll("circle")
     .style("fill", "orange");
 
 //Move "Enemies" at an interval
-setInterval(function () {
-  moveEnemies(enemies, neoData, collisionChecker);
-  scoreCounter(15);
-}, 1500);
+  setInterval(function () {
+    moveEnemies(enemies);
+    collisionCheck = collisionChecker(enemies, neoData);
+    console.log(collisionCheck);
+    if (collisionCheck) {
+      alert("Game Over");
+    }
+    scoreCounter(15);
+  }, 1500);
 
 
 //Track scoring
