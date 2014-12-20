@@ -1,9 +1,9 @@
 
 //Define global variables
-var width = 960;
-var height = 500;
+var width = 1660;
+var height = 800;
 var neoData = [{}];
-var enemies = [{},{},{},{},{},{},{},{},{},{},{},{},{},{}];
+var enemies = [{},{},{}];//,{},{},{},{},{},{},{},{},{},{},{}];
 var currentScore = 0;
 var highScore = 0;
 var collisions = 0;
@@ -27,7 +27,7 @@ var collisionChecker = function (enemies) {
   hero['cy'] = d3.select(".hero").attr("cy");
 
   _.each(enemies, function (value, key) {
-    if ((Math.abs(value['cy'] - hero['cy']) < 25) && (Math.abs(value['cx'] - hero['cx']) < 25)) {
+    if ((Math.abs(value['cy'] - hero['cy']) < 10) && (Math.abs(value['cx'] - hero['cx']) < 10)) {
        if (highScore < Math.floor(currentScore/100)) {
         highScore = Math.floor(currentScore/100);
         document.getElementById('highScore').innerHTML = Math.floor(currentScore/100);
@@ -37,7 +37,7 @@ var collisionChecker = function (enemies) {
       collisions++;
       document.getElementById('collisionCounter').innerHTML = Math.ceil(collisions/100);
     }
-    currentScore++;
+    currentScore += Math.sqrt(1 * Math.log(enemies.length));
     document.getElementById('currentScore').innerHTML = Math.floor(currentScore/100);
   });
 };
@@ -45,7 +45,7 @@ var collisionChecker = function (enemies) {
 //Move "Enemies"
 var moveEnemies = function (enemies) {
   positionGenerator(enemies);
-  var enemy = d3.selectAll(".enemy").transition().duration(1500)
+  var enemy = d3.selectAll(".enemy").transition().duration(3000)
     .attr("cx", function (d) { return d['cx'];})
     .attr("cy", function (d) { return d['cy'];});
 }
@@ -66,34 +66,38 @@ var neo = svg.selectAll("circle")
     .enter().append("circle")
     .attr("cx", function (d) { return d['cx'];})
     .attr("cy", function (d) { return d['cy'];})
-    .attr("r", 5)
+    .attr("r", 8)
     .attr("class","hero")
-    .style("fill", "white")
+    .style("fill", "red")
     .call(d3.behavior.drag().on("drag", function() {
         neo.attr('cx', d3.event.x)
         .attr('cy', d3.event.y); }
       ));
 
 //Create "Enemies"
-positionGenerator(enemies);
-var enemy = svg.selectAll("circle")
-    .data(enemies)
-    .enter().append("circle")
-    .attr("cx", function (d) { return d['cx'];})
-    .attr("cy", function (d) { return d['cy'];})
-    .attr("r", 10)
-    .attr("class","enemy")
-    .style("fill", "orange");
+var createEnemies = function () {
+  positionGenerator(enemies);
+  var enemy = svg.selectAll("circle")
+      .data(enemies)
+      .enter().append("circle")
+      .attr("cx", function (d) { return d['cx'];})
+      .attr("cy", function (d) { return d['cy'];})
+      .attr("r", 10)
+      .attr("class","enemy")
+      .style("fill", "orange");
+}
 
 //Checks collisions on an interval
 setInterval(function () {
     collisionChecker(enemies);
-  }, 1);
+  }, 10);
 
 //Move "Enemies" at an interval
   setInterval(function () {
+    createEnemies();
     moveEnemies(enemies);
-  }, 2000);
+    enemies.push({});
+  }, 3000);
 
 
 
