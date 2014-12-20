@@ -1,10 +1,10 @@
 //Function to generate a random position of an asteroid within the canvas
 var positionGenerator = function (asteroids) {
   for (var i = 0; i < asteroids.length; i++) {
-    var top = Math.floor(Math.random() * height);
-    var left = Math.floor(Math.random() * width);
-    asteroids[i]['top'] = top;
-    asteroids[i]['left'] = left;
+    var y = Math.floor(Math.random() * height);
+    var x = Math.floor(Math.random() * width);
+    asteroids[i]['y'] = y;
+    asteroids[i]['x'] = x;
   }
   return asteroids;
 };
@@ -12,7 +12,7 @@ var positionGenerator = function (asteroids) {
 // Creates asteroids object data
 var asteroids = [{"a": "One"},{"b": "Two"},{"c": "Three"},{"d": "Four"},{"e": "Four"}];
 
-// Creates SVG canvas in html
+// Creates canvas in html
 var width = 960,
     height = 500;
 
@@ -22,38 +22,37 @@ var space = d3.select("body").append("div")
     .attr("class", "space");
 
 // Initializes space
-var initGame = function (asteroids) {
+var initGame = function (data) {
   // Create asteroid nodes
-  var asteroid = space.selectAll("div").data(asteroids);
+  var asteroid = space.selectAll("img").data(data);
 
-  // Gets positions for asteroid nodes
-  positionGenerator(asteroids);
+// Gets positions for asteroid nodes
+  positionGenerator(data);
 
   // Places asteroid nodes on canvas
   asteroid.enter().append("img")
       .attr("class", "asteroid")
-      .style("top", function (d) { return d['top'] + "px";})
-      .style("left", function (d) { return d['left'] + "px";});
-
+      .style("top", function (d) { return d['y'] + "px";})
+      .style("left", function (d) { return d['x'] + "px";})
+      .attr("x", function (d) { return d['x'];})
+      .attr("y", function (d) { return d['y'];})
 };
 
-initGame(asteroids);
+/*initGame(asteroids);*/
 
 // Move asteroids after initialize
 
-var moveAsteroids = function () {
+var moveAsteroids = function (data) {
+  positionGenerator(data);
   var asteroid = d3.selectAll("img")
-      .style("top", function (d) {
-        return Math.floor(Math.random() * height) + "px";
-      })
-      .style("left", function (d) {
-        return Math.floor(Math.random() * width) + "px";
-      })
-
+      .style("top", function (d) { return d['y'] + "px";})
+      .style("left", function (d) { return d['x'] + "px";})
+      .attr("x", function (d) { return d['x'];})         // position the left of the rectangle
+      .attr("y", function (d) { return d['y'];});
 }
 
 // Interval to change asteroid node positions
-
+initGame(asteroids);
 setInterval(function () {
-  moveAsteroids();
+  moveAsteroids(asteroids);
 }, 200);
