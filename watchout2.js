@@ -21,29 +21,31 @@ var positionGenerator = function (enemies) {
 };
 
 //Function to check for collisions
-var collisionChecker = function (enemies, hero) {
+var collisionChecker = function (enemies) {
   var hero = {};
-  var result = false;;
   hero['cx'] = d3.select(".hero").attr("cx");
   hero['cy'] = d3.select(".hero").attr("cy");
 
   _.each(enemies, function (value, key) {
-    console.log('hero : ' + hero['cx'] + ', ' + hero['cy']);
-    console.log('enemy :', value['cx'] + ', ' + value['cy']);
-    console.log('-----------');
     if ((Math.abs(value['cy'] - hero['cy']) < 50) && (Math.abs(value['cx'] - hero['cx']) < 50)) {
-      console.log("COLLISION!");
-       result = true;
+       if (highScore < currentScore) {
+        highScore = Math.floor(currentScore/100);
+        document.getElementById('highScore').innerHTML = Math.floor(highScore);
+       }
+      currentScore = 0;
+      document.getElementById('currentScore').innerHTML = Math.floor(currentScore);
+      collisions++;
+      document.getElementById('collisionCounter').innerHTML = Math.floor(collisions);
     }
-    return result;
+    currentScore++;
+    document.getElementById('currentScore').innerHTML = Math.floor(currentScore/100);
   });
-  return result;
 };
 
 //Move "Enemies"
 var moveEnemies = function (enemies) {
   positionGenerator(enemies);
-  var enemy = d3.selectAll(".enemy").transition().duration(1500)
+  var enemy = d3.selectAll(".enemy").transition().duration(2000)
     .attr("cx", function (d) { return d['cx'];})
     .attr("cy", function (d) { return d['cy'];});
 }
@@ -85,33 +87,15 @@ var enemy = svg.selectAll("circle")
     .attr("class","enemy")
     .style("fill", "orange");
 
+//Checks collisions on an interval
+setInterval(function () {
+    collisionChecker(enemies);
+  }, 100);
+
 //Move "Enemies" at an interval
   setInterval(function () {
     moveEnemies(enemies);
-    collisionCheck = collisionChecker(enemies, neoData);
-    console.log(collisionCheck);
-    if (collisionCheck) {
-      alert("Game Over");
-    }
-    scoreCounter(15);
-  }, 1500);
-
-
-//Track scoring
-// not interacting with collisions or scoreboard on dom yet
-var scoreCounter = function (amount) {
-  var collision = false;
-    currentScore += amount;
-    //console.log(currentScore);
-
-  collisions++;
-  if (currentScore > highScore) {
-    highScore = currentScore;
-  } else {
-    currentScore = 0;
-  }
-};
-
+  }, 2000);
 
 
 
