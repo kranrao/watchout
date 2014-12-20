@@ -3,7 +3,7 @@
 var width = 960;
 var height = 500;
 var neoData = [{}];
-var enemies = [{},{},{},{},{}, {}, {}, {}, {}];
+var enemies = [{},{},{},{},{},{},{},{},{}];
 var currentScore = 0;
 var highScore = 0;
 var collisions = 0;
@@ -21,24 +21,27 @@ var positionGenerator = function (enemies) {
 
 //Function to check for collisions
 var collisionChecker = function (enemies, hero) {
-  var hero = hero;
-  console.log(hero);
+  var hero = {}
+  hero['cx'] = d3.select(".hero").attr("cx");
+  hero['cy'] = d3.select(".hero").attr("cy");
+
   _.each(enemies, function (value, key) {
-    console.log(enemies[key]['cy']);
-    console.log(hero['cy']);
-    if (enemies[key]['cy'] === hero[key]['cy'] || enemies[key]['cx'] === hero[key]['cx']) {
+    console.log('hero : ' + hero['cx'] + ', ' + hero['cy']);
+    console.log('enemy :', value['cx'] + ', ' + hero['cy']);
+    console.log('-----------');
+    if (Math.abs(value['cy'] - hero['cy']) < 50 && Math.abs(value['cx'] - hero['cx']) < 50) {
       console.log("COLLISION!");
     }
   })
 };
 
 //Move "Enemies"
-var moveEnemies = function (enemies, hero) {
+var moveEnemies = function (enemies, hero, callback) {
   positionGenerator(enemies);
   var enemy = d3.selectAll(".enemy").transition().duration(1500)
     .attr("cx", function (d) { return d['cx'];})
     .attr("cy", function (d) { return d['cy'];});
-    collisionChecker(enemies, hero);
+    callback(enemies, hero);
 }
 
 //Creates SVG canvas
@@ -53,11 +56,12 @@ var svg = d3.select("body").append("svg")
 
 //Create "Hero" circle
 // refactor drag function
+positionGenerator(neoData);
 var neo = svg.selectAll("circle")
     .data(neoData)
     .enter().append("circle")
-    .attr("cx", 25)
-    .attr("cy", 25)
+    .attr("cx", function (d) { return d['cx'];})
+    .attr("cy", function (d) { return d['cy'];})
     .attr("r", 10)
     .attr("class","hero")
     .style("fill", "white")
@@ -79,7 +83,7 @@ var enemy = svg.selectAll("circle")
 
 //Move "Enemies" at an interval
 setInterval(function () {
-  moveEnemies(enemies, neo);
+  moveEnemies(enemies, neoData, collisionChecker);
   scoreCounter(15);
 }, 1500);
 
@@ -89,7 +93,7 @@ setInterval(function () {
 var scoreCounter = function (amount) {
   var collision = false;
     currentScore += amount;
-    console.log(currentScore);
+    //console.log(currentScore);
 
   collisions++;
   if (currentScore > highScore) {
