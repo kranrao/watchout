@@ -44,7 +44,7 @@ var initGame = function (data) {
 
 var moveAsteroids = function (data) {
   positionGenerator(data);
-  var asteroid = d3.selectAll("img")
+  var asteroid = d3.selectAll("img").transition().duration(500)
       .style("top", function (d) { return d['y'] + "px";})
       .style("left", function (d) { return d['x'] + "px";})
       .attr("x", function (d) { return d['x'];})         // position the left of the rectangle
@@ -55,4 +55,4 @@ var moveAsteroids = function (data) {
 initGame(asteroids);
 setInterval(function () {
   moveAsteroids(asteroids);
-}, 200);
+}, 1000);
