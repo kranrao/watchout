@@ -1,9 +1,9 @@
 
-//Create space
+//Define global variables
 var width = 960;
 var height = 500;
 var neoData = [{}];
-var enemies = [{},{},{},{},{},{},{},{},{}];
+var enemies = [{},{},{},{},{},{},{},{},{},{},{},{},{},{}];
 var currentScore = 0;
 var highScore = 0;
 var collisions = 0;
@@ -20,22 +20,22 @@ var positionGenerator = function (enemies) {
   return enemies;
 };
 
-//Function to check for collisions
+//Check for collisions
 var collisionChecker = function (enemies) {
   var hero = {};
   hero['cx'] = d3.select(".hero").attr("cx");
   hero['cy'] = d3.select(".hero").attr("cy");
 
   _.each(enemies, function (value, key) {
-    if ((Math.abs(value['cy'] - hero['cy']) < 50) && (Math.abs(value['cx'] - hero['cx']) < 50)) {
-       if (highScore < currentScore) {
+    if ((Math.abs(value['cy'] - hero['cy']) < 25) && (Math.abs(value['cx'] - hero['cx']) < 25)) {
+       if (highScore < Math.floor(currentScore/100)) {
         highScore = Math.floor(currentScore/100);
-        document.getElementById('highScore').innerHTML = Math.floor(highScore);
+        document.getElementById('highScore').innerHTML = Math.floor(currentScore/100);
        }
       currentScore = 0;
       document.getElementById('currentScore').innerHTML = Math.floor(currentScore);
       collisions++;
-      document.getElementById('collisionCounter').innerHTML = Math.floor(collisions);
+      document.getElementById('collisionCounter').innerHTML = Math.ceil(collisions/100);
     }
     currentScore++;
     document.getElementById('currentScore').innerHTML = Math.floor(currentScore/100);
@@ -45,7 +45,7 @@ var collisionChecker = function (enemies) {
 //Move "Enemies"
 var moveEnemies = function (enemies) {
   positionGenerator(enemies);
-  var enemy = d3.selectAll(".enemy").transition().duration(2000)
+  var enemy = d3.selectAll(".enemy").transition().duration(1500)
     .attr("cx", function (d) { return d['cx'];})
     .attr("cy", function (d) { return d['cy'];});
 }
@@ -58,17 +58,15 @@ var svg = d3.select("body").append("svg")
     .append("g")
     .attr("width", width)
     .attr("height", height);
-    //.attr("transform", "translate(32," + (height / 2) + ")");
 
 //Create "Hero" circle
-// refactor drag function
 positionGenerator(neoData);
 var neo = svg.selectAll("circle")
     .data(neoData)
     .enter().append("circle")
     .attr("cx", function (d) { return d['cx'];})
     .attr("cy", function (d) { return d['cy'];})
-    .attr("r", 10)
+    .attr("r", 5)
     .attr("class","hero")
     .style("fill", "white")
     .call(d3.behavior.drag().on("drag", function() {
@@ -90,7 +88,7 @@ var enemy = svg.selectAll("circle")
 //Checks collisions on an interval
 setInterval(function () {
     collisionChecker(enemies);
-  }, 100);
+  }, 1);
 
 //Move "Enemies" at an interval
   setInterval(function () {
